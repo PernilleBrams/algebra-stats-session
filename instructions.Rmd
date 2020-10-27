@@ -1,0 +1,195 @@
+---
+title: "Instructions"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+Load some packages (you might want additional ones).
+
+```{r}
+
+library(pacman)
+p_load(tidyverse, lme4, cowplot)
+
+```
+
+## Exercise 2 --> Regression 1:
+
+1. Create a data-frame which containing the y and x data that you've used.
+
+2. Run a linear model to check your results:  
+
+2.1 The residuals should correspond to your errors
+(non-squared). 
+
+2.2 The estimates should correspond to your alpha and beta-values.
+
+2.3 Is the R-squared value close to the one that you got?
+
+2.4 Did you predict significance correctly?
+
+```{r}
+
+```
+
+## Exercise 2 --> Regression 2 (more complexity): 
+
+1. Run the model with a quadratic term. How should we specify this
+model if we wanted to do the calculation by hand? For this you
+can use the model.matrix() function which shows you the design matrix. 
+
+2. Is this model better (higher R^2). Will a model with more predictors
+always have a higher R^2?
+
+3. now add a new (factorial) variable to your data-frame. 
+You can call this variable gender. Set the value for the first
+two rows to 1 and the value for the last two rows as 0. 
+
+4. run a t-test on the data. How is the t-test specified (again
+you can use model.matrix()). Is the t-test significant and is this
+reasonable? Here you can draw and/or plot the model. 
+
+5. how does the design matrix look for other more complicated 
+models we could do? For instance, what about using both 
+variables as predictors - how about an interaction effect?
+Find out how the models are specified and which model is best. 
+
+6. An ANOVA is simply a t-test with more groups. 
+Make some fake data and find out how the design matrix 
+for an ANOVA is specified. 
+
+```{r}
+
+
+
+```
+
+## Exercise 3 (More data)
+
+Load the data set "gender_attributes.csv" 
+which is just some fake data that I generated. 
+
+1. Check out the data: 
+* Are the variables in a sensible/correct format?
+* Are the variables normally distributed (why, why not?)
+* Do some exploratory plotting of the data. 
+
+NB: If you create multiple similar plots then consider creating 
+a function instead of writing redundant code. There are 
+some trickies with writing tidy functions but it is well
+worth getting the hang of. Check out for instance:
+https://dplyr.tidyverse.org/articles/programming.html
+
+
+```{r}
+
+
+
+```
+
+2. Modeling: 
+* Discuss how the data could be modelled. 
+* Run some models (using lm()) and discuss which model best describes the data. 
+* If any effects are significant what does this mean?
+* Refer back to your plots from (1) or make new ones to visualize 
+the different models and what they imply. If a main
+effect is significant what is this compared to (plot the different models).
+Does it seem reasonable that the model with the significant effect is 
+a significantly better fit than the model without? What about interactions,
+how do we interpret that?
+
+```{r}
+
+
+```
+
+## Exercise 4 (embeddings)
+
+Below I have loaded the fake word-embeddings. 
+
+1. Compute the cosine similarity between 
+1.1: man and woman.
+1.2: man and king.
+NB: look into the "geometry" library or 
+compute the functions yourself:
+
+2. Analogies are fun (and useful). For instance we all know that
+man is to woman as king is to _____ (queen). 
+Does our stupid word embeddings also know that?
+How would you test that?
+
+Think along the lines of: 
+woman + king - man = queen  ---- or 
+man + queen - woman = king 
+
+Why should this work? Does it work?
+
+3. Can you think of other analogies? Test them out. 
+
+```{r}
+
+install.packages("geometry")
+library(geometry)
+
+#read the data: 
+embeddings <- read_csv("word_embeddings.csv") 
+rownames(embeddings) <- c("gender", "royal", "age", "food") #throws error because it is bad style.
+
+```
+
+
+## Exercise 5 (PCA) 
+
+Navigate to this link: 
+https://www.datacamp.com/community/tutorials/pca-analysis-r?utm_source=adwords_ppc&utm_campaignid=898687156&utm_adgroupid=48947256715&utm_device=c&utm_keyword=&utm_matchtype=b&utm_network=g&utm_adpostion=&utm_creative=332602034349&utm_targetid=aud-763347114660:dsa-429603003980&utm_loc_interest_ms=&utm_loc_physical_ms=1005278&gclid=Cj0KCQjwxNT8BRD9ARIsAJ8S5xbEDnmO1D8NfpRcz7SikOBnG21xLEJi1Pv6PpQ9Uvj81RIE_9vdpscaAkxLEALw_wcB 
+
+1. It walks you through a basic PCA analysis in R on the mtcars 
+(build in) data-set. I have pasted it in below. 
+Adapt the analysis for some new data (of your choosing) --> 
+for instance you could go to kaggle (or where ever)..
+
+2. Does the two principal components in your analysis seem
+reasonable (i.e. do the clusters make sense and not overlap too much?). 
+Which parameters/predictors contribute most to the most important principal components?
+
+3. Does it seem like we could drop any predictors/parameters?
+
+4. Why is PCA useful? 
+
+
+```{r}
+
+## load mtcars data set: 
+mtcars <- mtcars
+
+## select numeric variables: 
+mtcars.pca <- prcomp(mtcars[,c(1:7,10,11)], center = TRUE,scale. = TRUE)
+
+## inspect the data: 
+summary(mtcars.pca)
+str(mtcars.pca)
+
+## plot the data
+ggbiplot(mtcars.pca, labels=rownames(mtcars))
+
+## Not sure where the tutorial gets this information: 
+mtcars.country <- c(rep("Japan", 3), rep("US",4), rep("Europe", 7),rep("US",3), "Europe", rep("Japan", 3), rep("US",4), rep("Europe", 3), "US", rep("Europe", 3))
+
+## with ellipses marking the groups by country: 
+ggbiplot(mtcars.pca,ellipse=TRUE,  labels=rownames(mtcars), groups=mtcars.country)
+
+## with "worse" principal components (explaining less variance): 
+ggbiplot(mtcars.pca,ellipse=TRUE,choices=c(3,4),   labels=rownames(mtcars), groups=mtcars.country)
+
+## what is the recipe for each PC?
+mtcars.pca$rotation
+
+```
+
+Your code goes here: 
+
+```{r}
+
+```
+

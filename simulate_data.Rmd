@@ -1,0 +1,101 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+Load packages & set working directory
+
+```{r}
+
+library(pacman)
+p_load(tidyverse, lme4)
+
+```
+
+Generate fake data (interaction).
+Men & Women height and weight. 
+
+
+```{r}
+
+### set a sigma and mean for both groups and relationship:
+sigma_e = 20
+mean_men = 100
+mean_women = 70
+y_men = -0.5
+y_women = 0.5
+
+## Men data: 
+weight = rnorm(100, 
+                 mean = mean_men, 
+                 sd = sigma_e)
+
+height = (weight*y_men) + mean_men + rnorm(100,
+                                               mean = 0, 
+                                               sd = sigma_e)
+
+#checking men data: 
+df_men <- data.frame(weight, height, 
+                     gender = c(rep(1, 100)))
+
+ggplot(df_men, aes(x = weight, y = height))+
+  geom_point()+
+  geom_smooth(method = "lm")
+
+
+## Women data: 
+weight = rnorm(100, 
+                 mean = mean_women, 
+                 sd = sigma_e)
+
+
+height = weight*y_women + mean_women + rnorm(100, 
+                                                 mean = 0, 
+                                                 sd = sigma_e)
+
+
+#checking women data:
+df_women <- data.frame(weight, height, 
+                       gender = c(rep(0, 100)))
+ggplot(df_women, aes(x = weight, y = height))+
+  geom_point()+
+  geom_smooth(method = "lm")
+
+#putting it into a dataframe: 
+df_people <- rbind(df_men, df_women) %>%
+  mutate(gender = as.factor(gender))
+
+ggplot(df_people, aes(weight, height, color = gender))+
+  geom_point()+
+  geom_smooth(method = "lm")
+
+## check model: 
+mod <- lm(height ~ weight * gender, df_people)
+summary(mod)
+
+write_csv(df_people, "gender_attributes.csv")
+
+```
+
+fake word-embeddings: 
+
+```{r}
+
+df_words <- data.frame(
+  man = c(-1, 0.01, 0.03, 0.04),
+  woman = c(1, 0.02, 0.02, 0.01),
+  king = c(-0.95, 0.93, 0.7, 0.02),
+  queen = c(0.97, 0.95, 0.69, 0.01),
+  apple = c(0.00, -0.01, 0.03, 0.95),
+  orange = c(0.01, 0.00, -0.02, 0.97)
+)
+
+rownames(df_words) <- c("gender", "royal", "age", "food")
+
+write_csv(df_words, "word_embeddings.csv")
+
+```
+
+
